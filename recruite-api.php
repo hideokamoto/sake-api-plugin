@@ -31,13 +31,13 @@ function get_shop_list( $atts ) {
 	$atts = shortcode_atts(
 		array(
 			'area_code' => '',
+      'area_type' => 'small',
 			'curtome_api_query' => ''
 		),
 		$atts
 	);
 
-  $options = get_option('my-recruite-api');
-  $html = my_get_the_content( $atts['area_code'], $options['recruite_api_key'], $options['vc_url'] , $atts['curtome_api_query'] );
+  $html = my_get_the_content( $atts['area_code'], $atts['curtome_api_query'], $atts['area_type'] );
     return $html;
 }
 
@@ -49,14 +49,42 @@ function my_get_cta_link( $link, $device, $text ) {
 	return $html;
 }
 
-function my_get_the_content( $area_code, $key, $vc_url , $curtome_api_query ) {
+function my_area_type( $area_type, $area_code ) {
+  $query = '';
+  switch ( $area_type ) {
+    case 'small':
+      $query = "small_area={$area_code}";
+      break;
+
+    case 'middle':
+      $query = "middle_area={$area_code}";
+      break;
+
+    case 'large':
+      $query = "large_area={$area_code}";
+      break;
+
+    default:
+      $query = "small_area={$area_code}";
+      break;
+  }
+  return $query;
+}
+
+function my_get_the_content( $area_code, $curtome_api_query, $area_type ) {
+    $options = get_option('my-recruite-api');
+    $vc_url = $options['vc_url'];
+    $key = $options['recruite_api_key'];
     if ( wp_is_mobile() ) {
         $device = 'mobile';
     } else {
         $device = 'pc';
     }
     $url = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?format=json&sake=1';
-    $response = wp_remote_get("{$url}&key={$key}&small_area={$area_code}&{$curtome_api_query}");
+    $area_query = my_area_type( $area_type, $area_code );
+    var_dump($area_query);
+    $response = wp_remote_get("{$url}&key={$key}&{$area_query}&{$curtome_api_query}");
+
     $body = json_decode($response['body'],true);
     $count = $body['results']['results_available'];
     $html = "<p>{$count}件</p>";
