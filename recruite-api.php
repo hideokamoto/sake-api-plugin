@@ -82,7 +82,6 @@ function my_get_the_content( $area_code, $curtome_api_query, $area_type ) {
     }
     $url = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?format=json&sake=1';
     $area_query = my_area_type( $area_type, $area_code );
-    var_dump($area_query);
     $response = wp_remote_get("{$url}&key={$key}&{$area_query}&{$curtome_api_query}");
 
     $body = json_decode($response['body'],true);
