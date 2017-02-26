@@ -71,6 +71,10 @@ function my_area_type( $area_type, $area_code ) {
   return $query;
 }
 
+function my_get_credit() {
+  return '<a href="http://webservice.recruit.co.jp/"><img src="http://webservice.recruit.co.jp/banner/hotpepper-s.gif" alt="ホットペッパー Webサービス" width="135" height="17" border="0" title="ホットペッパー Webサービス"></a>';
+}
+
 function my_get_the_content( $area_code, $curtome_api_query, $area_type ) {
     $options = get_option('my-recruite-api');
     $vc_url = $options['vc_url'];
@@ -86,8 +90,7 @@ function my_get_the_content( $area_code, $curtome_api_query, $area_type ) {
 
     $body = json_decode($response['body'],true);
     $count = $body['results']['results_available'];
-    $html = "<p>{$count}件</p>";
-    //$html .= "<table>";
+    $html = "<p>{$count}件<small>【画像提供：ホットペッパー グルメ】</small></p>";
     foreach ( $body['results']['shop'] as $id => $shop ) {
         $page = urlencode($shop['urls'][ $device ]);
         $link = "{$vc_url}{$page}";
@@ -145,14 +148,13 @@ function my_get_the_content( $area_code, $curtome_api_query, $area_type ) {
             $html .= "<p><small>{$shop['other_memo']}</small></p>";
             $html .= '</dd>';
         }
-
         $html .= '</dl>';
-
         $html .= my_get_cta_link( $link, $device, 'もっと情報をみる（Hotpepper）' );
         $html .= '</div>';
         $html .= '</div>';
         $html .= '</div>';
         $html .= '</div>';
     }
-    return $html;
+    $credit = my_get_credit();
+    return "<div>{$html}{$credit}</div>";
 }
